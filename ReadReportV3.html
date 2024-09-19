@@ -38,12 +38,11 @@
 
     <script src="https://cdn.datatables.net/searchbuilder/1.8.0/js/dataTables.searchBuilder.js"></script>
 	<script src="https://cdn.datatables.net/searchbuilder/1.8.0/js/searchBuilder.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/datetime/1.5.3/js/dataTables.dateTime.min.js"></script>
+    <script src="https://cdn.datatables.net/datetime/1.5.3/js/dataTables.dateTime.min.js"></script>        
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 
-
-        
     <meta charset=utf-8 />
-    <title>Read Report</title>
+    <title>Display Report</title>
 	<style>
         p {color:blue;}
 		
@@ -223,16 +222,12 @@
   </head>
   <body>
     <div class="container-fluid">
-        <!-- <button id="engineer">Search for Engineer in column 2</button><br>
-        <button id="london">Search for London in column 3</button><br>
-        <button id="range">Age range 40-45 in column 4</button><br>
-        <button id="salary">Salary range 3000-4000 in column 5</button><br>
-        <button id="clear">Clear column searches</button><br> -->
         <div class="center">Drag and Drop File</div>
         <div class="center" style="border: dashed 3px grey;padding:5px;width:450px;">
             <input type="file" accept=".csv" name="file" id="file" style="cursor: pointer;">
         </div>
-        <div id='output' class="center">
+        <div id='output' class="center">            
+            <a href="ReadReportV3.html">Download File</a>
         </div>
         <br />
         <p id="spnHeadertxt" class="center"></p>            
@@ -243,268 +238,262 @@
     </div>    	
 
 	<script>	
-    const $output = document.getElementById('output')
-    document.getElementById('file').onchange = function() {	
-        sessionStorage.clear();
-        document.getElementById("output").style.display = 'none';
-        document.getElementById("reportDiv").style.display = 'block';
-        var file = this.files[0];
-        var items = [];
-        var reader = new FileReader();
-        const name = this.files[0].name;
-        const lastDot = name.lastIndexOf('.');
-        const fileName = name.substring(0, lastDot);
-        const ext = name.substring(lastDot + 1);
-        document.getElementById("spnHeadertxt").innerHTML = fileName;
-        reader.onload = function(progressEvent) {
-            // Entire file
-            const text = this.result;
-            //$output.innerText = text
+        const $output = document.getElementById('output')
+        document.getElementById('file').onchange = function() {	
+            sessionStorage.clear();
+            document.getElementById("output").style.display = 'none';
+            document.getElementById("reportDiv").style.display = 'block';
+            var file = this.files[0];
+            var items = [];
+            var reader = new FileReader();
+            const name = this.files[0].name;
+            const lastDot = name.lastIndexOf('.');
+            const fileName = name.substring(0, lastDot);
+            const ext = name.substring(lastDot + 1);
+            document.getElementById("spnHeadertxt").innerHTML = fileName;
+            reader.onload = function(progressEvent) {
+                // Entire file
+                const text = this.result;
+                //$output.innerText = text
 
-            // By lines
-            var lines = text.split('\n');	
-            for (var line = 0; line < lines.length; line++) {
-                if(!lines[line].includes('James Shields Middle School') && !lines[line].includes('List of Students in Program') 
-                && !lines[line].includes('Page break option:') && !lines[line].includes('Report ID:') && !lines[line].includes('Total Student for School:')){
-                    if(line <= 3){
-                        var partsOfStr = lines[line].split(',');
-                        console.log(partsOfStr);
-                        if(!partsOfStr.includes('Student #')){						
-                            console.log("EXIT NOT ACCPETAPLE FILE");
-                            document.getElementById("output").style.display = 'block';
-                            document.getElementById("output").innerHTML = 'File not formatted properly';
-                            document.getElementById("output").style.color = "red";
-                            break;
+                // By lines
+                var lines = text.split('\n');	
+                for (var line = 0; line < lines.length; line++) {
+                    if(!lines[line].includes('School') && !lines[line].includes('List of Students in Program') 
+                    && !lines[line].includes('Page break option:') && !lines[line].includes('Report ID:') && !lines[line].includes('Total Student for School:')){
+                        if(line <= 3){
+                            var partsOfStr = lines[line].split(',');
+                            console.log(partsOfStr);
+                            if(!partsOfStr.includes('Student #')){						
+                                console.log("EXIT NOT ACCPETAPLE FILE");
+                                document.getElementById("output").style.display = 'block';
+                                document.getElementById("output").innerHTML = 'File not formatted properly';
+                                document.getElementById("output").style.color = "red";
+                                break;
+                            }
                         }
-                    }
-                    if(lines[line].includes('Homeroom')){
-                        str = lines[line].split("Homeroom");
-                        var newStr = str[str.length - 1].replaceAll(",", "");
-                    }
-                    if(!lines[line].includes('Student #') && !lines[line].includes('Homeroom')){	
-                        let pattern = /"([^"]*)"|[^\s,'"]+(?:\s+[^\s,'"]+)*|(?<=,)\s*(?=,)/g;
-                        let resultNull = pattern.test(lines[line]);
-                        var withRoom = newStr+","+lines[line];
-                        var result = withRoom.match(pattern);
-                        if(resultNull == true){
-                            console.log("resultNull "+resultNull);
+                        if(lines[line].includes('Homeroom')){
+                            str = lines[line].split("Homeroom");
+                            console.log(str);
+                            var newStr = str[str.length - 1].replaceAll(",", "");
+                            console.log(newStr);
                         }
-                        else{
-                            console.log("break "+resultNull);
-                            break;
+                        if(!lines[line].includes('Student #') && !lines[line].includes('Homeroom')){	
+                            let pattern = /"([^"]*)"|[^\s,'"]+(?:\s+[^\s,'"]+)*|(?<=,)\s*(?=,)/g;
+                            let resultNull = pattern.test(lines[line]);
+                            var withRoom = newStr+","+lines[line];
+                            var result = withRoom.match(pattern);
+                            console.log(result);
+                            if(resultNull == true){
+                                console.log("resultNull "+resultNull);
+                            }
+                            else{
+                                console.log("break "+resultNull);
+                                break;
+                            }
+                            items.push(result);
                         }
-                        items.push(result);
                     }
                 }
-            }
-            var dataSet = items;            
-            $('#reportTbl').DataTable({
-                destroy: true,
-                fixedHeader: true,                
-                fixedColumns: {
-                    start: 4
-                },
-                select: true,
-                //lengthMenu: [[50, 100 - 1], [50, 100, "All"]],
-                
-                /* scrollCollapse: true,
-                scrollX: true,
-                scrollY: 500, */
-                
-                /* buttons: [
-                            {
-                                extend: 'collection',
-                                className: 'btn-small',
-                                text: 'Export',
-                                buttons: [                        
-                                    {
-                                        extend: 'pdfHtml5',
-                                        orientation: 'landscape',
-                                        title: 'List of Students in Program'
-                                    },
-                                    'csv',
-                                    'excel',
-                                    
-                                ]
-                            },                
-                        ], */
-                /* language: {
-                    searchBuilder: {
-                        button: 'Filter'
-                    }
-                }, */
-                layout: {
-                    top1: {
-                        /* buttons: [
-                        {
-                            extend: 'searchBuilder',
-                            text: 'Search Filter',
-                            config: {
-                                depthLimit: 2
+                var dataSet = items;            
+                $('#reportTbl').DataTable({
+                    destroy: true,
+                    fixedHeader: true,                
+                    fixedColumns: {
+                        start: 4
+                    },
+                    order: [[4, 'asc']],
+                    select: true,
+                    //lengthMenu: [[50, 100 - 1], [50, 100, "All"]],
+                    
+                    /* scrollCollapse: true,
+                    scrollX: true,
+                    scrollY: 500, */
+                    
+                    /* buttons: [
+                                {
+                                    extend: 'collection',
+                                    className: 'btn-small',
+                                    text: 'Export',
+                                    buttons: [                        
+                                        {
+                                            extend: 'pdfHtml5',
+                                            orientation: 'landscape',
+                                            title: 'List of Students in Program'
+                                        },
+                                        'csv',
+                                        'excel',
+                                        
+                                    ]
+                                },                
+                            ], */                
+                    layout: {
+                        top1: {                        
+                            searchBuilder: {
+                                columns: [0,1,3,5,6,8,9,1,13,15,16,19,20,21,23,24,25,26,27], 
+                                liveSearch: false, 
+                                className: 'filterthis',                          
                             }
                         },
-                        ], */
-                        searchBuilder: {
-                            //button: 'Search Filter',
-                            columns: [0,1,3,5,6,8,9,1,13,15,16,19,20,21,23,24,25,26,27],                            
-                        }
-                    },
-                    topStart: {
-                        buttons: [                            
-                           /*  {
-                                extend: 'searchBuilder',
-                                text: 'Search Filter',
-                                config: {
-                                    depthLimit: 2
-                                }
-                            }, */
-                            {
-                                extend:'pageLength',
-                                className: 'btn-small',
-                                //text: 'bb',
-                            }, 
-                            {
-                                extend: 'collection',
-                                className: 'btn-small',
-                                text: 'Export',
-                                buttons: [                        
-                                    {
-                                        extend: 'pdfHtml5',
-                                        orientation: 'landscape',
-                                        title: 'List of Students in Program',
-                                        exportOptions: {
-                                            columns: ':visible'
-                                        }
+                        topStart: {
+                            buttons: [       
+                                {
+                                    extend:'pageLength',
+                                    className: 'btn-small',
+                                    //text: 'bb',
+                                }, 
+                                {
+                                    extend: 'collection',
+                                    className: 'btn-small',
+                                    text: 'Export',
+                                    buttons: [                        
+                                        {
+                                            extend: 'pdfHtml5',
+                                            orientation: 'landscape',
+                                            title: 'List of Students in Program',
+                                            exportOptions: {
+                                                columns: ':visible'
+                                            }
+                                        },
+                                        {
+                                            extend: 'csv',
+                                            title: 'List of Students in Program',
+                                            exportOptions: {
+                                                columns: ':visible'
+                                            }
+                                        },
+                                        {
+                                            extend: 'excel',
+                                            title: 'List of Students in Program',
+                                            exportOptions: {
+                                                columns: ':visible'
+                                            }
+                                        },
+                                    ]
+                                },                                                       
+                                
+                                /*{
+                                    extend: 'excelHtml5',
+                                    exportOptions: {
+                                        columns: ':visible'
                                     },
-                                    {
-                                        extend: 'csv',
-                                        title: 'List of Students in Program',
-                                        exportOptions: {
-                                            columns: ':visible'
-                                        }
-                                    },
-                                    {
-                                        extend: 'excel',
-                                        title: 'List of Students in Program',
-                                        exportOptions: {
-                                            columns: ':visible'
-                                        }
-                                    },
-                                ]
-                            },                                                       
-                            
-                            /*{
-                                extend: 'excelHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
+                                    className: 'btn-small'
                                 },
-                                className: 'btn-small'
-                            },
-                            {
-                                extend: 'collection',
-                                className: 'btn-small',
-                                buttons: [
+                                {
+                                    extend: 'collection',
+                                    className: 'btn-small',
+                                    buttons: [
 
-                                ]
-                            },  */                                                                  
-                        ]
+                                    ]
+                                },  */                                                                  
+                            ]
+                        },
+                        /* bottom1Start: {
+                            buttons: ['pageLength'],
+                        }, */
                     },
-                    /* bottom1Start: {
-                        buttons: ['pageLength'],
-                    }, */
-                },
-                /* lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, 'All']
-                ], */		
-                language: {
-                    search: '_INPUT_',
-                    searchPlaceholder: 'Search...',
-                    paginate: {
-                        first: 'First',
-                        next: 'Next',
-                        previous: 'Previous',
-                        last: 'Last'
-                    },
-                    searchBuilder: {
-                        add: 'Search Filter',
-                        title: 'Search Builder',
-                    }
-                },
-                columnDefs: [
-                    { 
-                        visible: false, targets: [2,4,7,11,12,14,17,18,22]                         
-                    },
-                    { 
-                        searchable: false, targets: [2,4,7,11,12,14,17,18,22] 
-                    },
-                    {
-                        targets: '_all', className: 'dt-body-left'
-                    },
-                ],
-                columns: [
-                    { title: 'Room' },
-                    { title: 'Student#' },
-                    { title: '' },
-                    { title: 'Student Name',
-                    render: function ( data, type, row, meta ) {
-                        if ( data === null ) {// Do some type checking
-                            return "";
+                    /* lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'All']
+                    ], */		
+                    language: {
+                        search: '_INPUT_',
+                        searchPlaceholder: 'Search...',
+                        paginate: {
+                            first: 'First',
+                            next: 'Next',
+                            previous: 'Previous',
+                            last: 'Last'
+                        },
+                        searchBuilder: {
+                            add: 'Search Filter',
+                            title: 'Search Builder',                            
                         }
-                        return data.replace(/"/g, "");
-                    }			
                     },
-                    { title: '' },
-                    { title: 'Grade' },
-                    { title: 'Language' },
-                    { title: '' },
-                    { title: 'Program Model' },
-                    { title: 'Placement Model' },
-                    { title: 'Instructional Context' },
-                    { title: '' },
-                    { title: '' },
-                    { title: 'Assessment Accommodations' },
-                    { title: '' },
-                    { title: 'Periods per Week' },
-                    { title: 'Dis Code' },
-                    { title: '' },
-                    { title: '' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Bilingual Special Education Service Models" style="text-decoration:none">Sped Model</a>' },				
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Program Year" style="text-decoration:none">PY</a>' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Reading Proficiency Level" style="text-decoration:none">RPL</a>' },
-                    { title: '' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Writing Proficiency Level" style="text-decoration:none">WPL</a>' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Listening Proficiency Level" style="text-decoration:none">LPL</a>' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Speaking Proficiency Level" style="text-decoration:none">SPL</a>' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Literacy Proficiency Level" style="text-decoration:none">LiPL</a>' },
-                    { title: '<a href="#" data-bs-toggle="tooltip" title="Access Compsite" style="text-decoration:none">Access Com</a>' },		
-                ],
-                data: dataSet,			
-                drawCallback: function () { 
-                let tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-                let tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
-                    boundary: document.body,
-                    container: 'body',
-                    trigger: 'hover'
-                })); 
-                tooltipList.forEach((tooltip) => { $('.tooltip').hide(); });
-                
-                let popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-                let popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, {
-                    boundary: document.body,
-                    container: 'body',
-                    trigger: 'hover'
-                })); 				  
-                popoverList.forEach((popover) => { $('.popover').hide(); });				  
-                },
-                initComplete: function() {
-                    var tblName = $(this).attr('id');
-                    
-                }
+                    columnDefs: [
+                        { 
+                            visible: false, targets: [2,4,7,11,12,14,17,18,22]                         
+                        },
+                        { 
+                            searchable: false, targets: [2,4,7,11,12,14,17,18,22] 
+                        },
+                        {
+                            targets: '_all', className: 'dt-body-left'
+                        },
+                    ],
+                    columns: [
+                        { title: 'Room' },
+                        { title: 'Student#' },
+                        { title: '' },
+                        { title: 'Student Name',
+                        render: function ( data, type, row, meta ) {
+                            if ( data === null ) {// Do some type checking
+                                return "";
+                            }
+                            return data.replace(/"/g, "");
+                        }			
+                        },
+                        { title: '' },
+                        { title: 'Grade' },
+                        { title: 'Language' },
+                        { title: '' },
+                        { title: 'Program Model' },
+                        { title: 'Placement Model' },
+                        { title: 'Instructional Context' },
+                        { title: '' },
+                        { title: '' },
+                        { title: 'Assessment Accommodations' },
+                        { title: '' },
+                        { title: 'Periods per Week' },
+                        { title: 'Dis Code' },
+                        { title: '' },
+                        { title: '' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Bilingual Special Education Service Models" style="text-decoration:none">Sped Model</a>' },				
+                        { title: '<a href="#" data-bs-toggle="popover" title="Program Year" style="text-decoration:none">PY</a>' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Reading Proficiency Level" style="text-decoration:none">RPL</a>' },
+                        { title: '' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Writing Proficiency Level" style="text-decoration:none">WPL</a>' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Listening Proficiency Level" style="text-decoration:none">LPL</a>' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Speaking Proficiency Level" style="text-decoration:none">SPL</a>' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Literacy Proficiency Level" style="text-decoration:none">LiPL</a>' },
+                        { title: '<a href="#" data-bs-toggle="popover" title="Access Compsite" style="text-decoration:none">Access Com</a>' },		
+                    ],
+                    data: dataSet,			
+                    drawCallback: function () { 
+                        let tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                        let tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
+                            boundary: document.body,
+                            container: 'body',
+                            trigger: 'hover'
+                        })); 
+                        tooltipList.forEach((tooltip) => { $('.tooltip').hide(); });
+                        
+                        let popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+                        let popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, {
+                            boundary: document.body,
+                            container: 'body',
+                            placement: 'top',
+                            trigger: 'hover'
+                        })); 				  
+                        popoverList.forEach((popover) => { $('.popover').hide(); });				  
+                    },
+                    initComplete: function() {
+                        var tblName = $(this).attr('id');                    
+                    }
+                });
+            };
+            reader.readAsText(file);  	
+        };  
+        
+        $(document).on('click','.dtsb-search',function(){
+            //alert("You clicked the element with and ID of 'test-element'");
+            $("#reportTbl").LoadingOverlay("show", {
+                //background: "#cae4fa",
+                size: '75',
+                maxSize: '75',
             });
-        };
-        reader.readAsText(file);  	
-    };    
+            $("#reportTbl").LoadingOverlay("hide", true);
+        });
 	</script>
   </body>
 </html>
